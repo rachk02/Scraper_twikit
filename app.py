@@ -34,9 +34,9 @@ async def get_tweets(tweets, client, max_retries):
 
 
 async def authenticate(client, config):
-    username = config['X']['username']
-    email = config['X']['email']
-    password = config['X']['password']
+    username = config['AUTH']['username']
+    email = config['AUTH']['email']
+    password = config['AUTH']['password']
     cookies_file = config['FILES']['cookie_file']
 
     if not os.path.exists(cookies_file):
