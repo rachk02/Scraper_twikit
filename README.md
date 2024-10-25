@@ -1,93 +1,184 @@
-# Sraper_twikit
+## Documentation du Projet de Collecte de Tweets
 
+### Table des Matières
+1. [Description du Projet](#description-du-projet)
+2. [Prérequis](#prérequis)
+3. [Étapes de Clonage et Installation](#etapes-de-clonage-et-installation)
+4. [Fichier de Configuration (`config.ini`)](#fichier-de-configuration-configini)
+5. [Dépendances (`requirements.txt`)](#dépendances-requirementstxt)
+6. [Description des Fonctions Principales](#description-des-fonctions-principales)
 
+---
 
-## Getting started
+### 1. Description du Projet
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Ce projet est un script Python asynchrone qui permet de récupérer des tweets associés à des mots-clés spécifiques sur l'Université Virtuelle du Burkina Faso (UVBF). Les tweets sont sauvegardés en format CSV et JSON pour une analyse ultérieure. 
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Le script utilise la bibliothèque `httpx` pour gérer les requêtes asynchrones et `twikit` pour interagir avec l'API de Twitter.
 
-## Add your files
+### 2. Prérequis
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- **Python 3.7+**
+- **Connexion Internet** pour accéder à l'API de Twitter
+- **Compte et accès à l'API Twitter** (les identifiants doivent être fournis)
 
+---
+
+### 3. Étapes de Clonage et Installation
+
+Suivez ces étapes pour configurer et exécuter le projet :
+
+1. **Cloner le dépôt** :
+   ```bash
+   git clone https://gitlab.com/rachk02/sraper_twikit.git
+   cd Scraper_twikit
+   ```
+
+2. **Créer un environnement virtuel** (fortement recommandé) :
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # Sur Linux/macOS
+   venv\Scripts\activate     # Sur Windows
+   ```
+
+3. **Installer les dépendances** :
+   Assurez-vous d’avoir créé un fichier `requirements.txt` avec le contenu fourni dans la section [Dépendances](#dépendances-requirementstxt) ci-dessous, puis exécutez :
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configurer le fichier `config.ini`** : Créez un fichier `config.ini` et configurez-le comme expliqué dans la section [Fichier de Configuration](#fichier-de-configuration-configini).
+
+5. **Exécuter le script** :
+   ```bash
+   python app.py
+   ```
+
+---
+
+### 4. Fichier de Configuration (`config.ini`)
+
+Le fichier `config.ini` contient les informations de configuration nécessaires pour l'authentification, les paramètres de recherche et les fichiers de sortie.
+
+**Exemple de `config.ini`** :
+
+```ini
+[AUTH]
+username = your_username
+email = your_email
+password = your_password
+
+[SEARCH]
+query = (Université UVBF OR UVBF OR #UVBF OR "Université Virtuelle du Burkina Faso" OR "UV-BF" OR "UV BF" OR "UV_BF") lang:fr
+
+[FILES]
+csv_file = tweets_uvbf.csv
+json_file = tweets_uvbf.json
+cookie_file = cookies.json
+
+[SETTINGS]
+minimum_tweets = 500
+max_inactivity_tries = 2
+max_retry_timeout = 3
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/rachk02/sraper_twikit.git
-git branch -M main
-git push -uf origin main
+
+- **[AUTH]** : Les informations d'identification pour se connecter à l'API de Twitter.
+- **[SEARCH]** : Les mots-clés pour la recherche Twitter.
+- **[FILES]** : Les noms des fichiers de sortie pour les tweets en CSV et JSON, ainsi que le fichier de cookies pour l'authentification.
+- **[SETTINGS]** : Les paramètres de la collecte, comme le nombre de tweets minimum, les tentatives maximales d’inactivité et les tentatives maximales en cas de `Timeout`.
+
+---
+
+### 5. Dépendances (`requirements.txt`)
+
+Créez un fichier `requirements.txt` contenant les dépendances suivantes :
+
+```text
+asyncio
+httpx
+twikit
+configparser
 ```
 
-## Integrate with your tools
+Installez ces dépendances avec la commande :
+```bash
+pip install -r requirements.txt
+```
 
-- [ ] [Set up project integrations](https://gitlab.com/rachk02/sraper_twikit/-/settings/integrations)
+---
 
-## Collaborate with your team
+### 6. Description des Fonctions Principales
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Le script est composé des fonctions suivantes, chacune ayant un rôle spécifique dans le processus de collecte des tweets.
 
-## Test and Deploy
+#### `get_tweets(tweets, client, max_retries)`
 
-Use the built-in continuous integration in GitLab.
+- **Description** : Récupère des tweets en utilisant l'API de Twitter. En cas de `Timeout`, la fonction réessaie jusqu'à `max_retries` fois avant d'arrêter la recherche.
+- **Arguments** :
+  - `tweets` : Instance de tweets récupérés. Si `None`, une nouvelle requête de recherche est lancée.
+  - `client` : Client Twitter authentifié.
+  - `max_retries` : Nombre maximal de tentatives en cas de `Timeout`.
+- **Retour** : Retourne les tweets récupérés ou lève une exception si `max_retries` est atteint.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+#### `authenticate(client, config)`
 
-***
+- **Description** : Authentifie l'utilisateur en utilisant les identifiants dans `config.ini`. Si des cookies d'authentification existent, ils sont utilisés pour éviter une nouvelle connexion.
+- **Arguments** :
+  - `client` : Instance du client Twitter pour la connexion.
+  - `config` : Fichier de configuration `config.ini` contenant les informations de connexion.
 
-# Editing this README
+#### `save_to_csv(tweet_data, csv_file)`
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+- **Description** : Enregistre un tweet individuel dans le fichier CSV spécifié.
+- **Arguments** :
+  - `tweet_data` : Dictionnaire contenant les informations du tweet.
+  - `csv_file` : Chemin du fichier CSV pour enregistrer les tweets.
 
-## Suggestions for a good README
+#### `save_to_json(tweets_data, json_file)`
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- **Description** : Enregistre tous les tweets récupérés dans un fichier JSON.
+- **Arguments** :
+  - `tweets_data` : Liste des dictionnaires de tweets.
+  - `json_file` : Chemin du fichier JSON.
 
-## Name
-Choose a self-explaining name for your project.
+#### `fetch_tweets(client, config)`
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+- **Description** : Récupère les tweets jusqu'à atteindre le `minimum_tweets` spécifié ou le nombre maximum de tentatives d'inactivité (`max_inactivity_tries`). Effectue des sauvegardes intermédiaires en JSON après chaque lot de tweets récupérés.
+- **Arguments** :
+  - `client` : Instance du client Twitter pour la récupération des tweets.
+  - `config` : Fichier de configuration `config.ini` contenant les paramètres de collecte et de fichiers.
+- **Détails supplémentaires** :
+  - Gère les exceptions `TooManyRequests` pour éviter de dépasser les limites de l'API.
+  - Relance la récupération en cas de `Timeout`, dans la limite du nombre de tentatives défini.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+#### `main()`
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- **Description** : Fonction principale pour exécuter le programme.
+- **Étapes** :
+  1. Charge les paramètres depuis le fichier `config.ini`.
+  2. Authentifie le client Twitter.
+  3. Lance la collecte de tweets avec les paramètres définis.
+  
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Exemple d'Exécution
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Une fois la configuration et les installations terminées, vous pouvez exécuter le script. Voici un exemple de sortie :
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```plaintext
+2024-10-25 18:03:42.339857 - Cookies chargés avec succès.
+2024-10-25 18:03:42.339914 - Initialisation de la recherche...
+2024-10-25 18:04:05.068649 - 1 tweets récupérés.
+...
+2024-10-25 18:15:50.400104 - Sauvegarde intermédiaire des tweets en JSON.
+2024-10-25 18:18:40.840868 - Recherche terminée. 500 tweets récupérés et sauvegardés.
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+---
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Notes Importantes
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- **Gestion des Limites d'API** : En cas de `TooManyRequests`, le script attend jusqu'à la fin de la limite.
+- **Interruption** : En cas d'arrêt manuel (Ctrl + C), le programme sauvegardera les tweets récupérés jusqu'à ce point.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Cette documentation vous permet de cloner, configurer, et exécuter le projet en toute autonomie, avec des paramètres de personnalisation dans `config.ini`.
