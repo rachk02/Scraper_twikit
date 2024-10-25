@@ -30,7 +30,7 @@ Suivez ces étapes pour configurer et exécuter le projet :
 
 1. **Cloner le dépôt** :
    ```bash
-   git clone https://gitlab.com/rachk02/sraper_twikit.git
+   git clone https://github.com/rachk02/Scraper_twikit.git
    cd Scraper_twikit
    ```
 
